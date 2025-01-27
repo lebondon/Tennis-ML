@@ -71,10 +71,8 @@ def parse_with_split(line):
     except (IndexError, AttributeError):
         return None
     return None
-    
-    
-    
 
+    
 opener = CustomURLopener()
 response = opener.open('https://live-tennis.eu/en/atp-live-ranking')
 response=response.read().decode()
@@ -82,11 +80,13 @@ response=response.read().decode()
 soup = BeautifulSoup(response, 'html.parser')
 
 all_list=soup.find_all('td',class_='rk')
+
 data=[]
 for i in all_list:
     line=parse_with_split(str(i))
     data.append(line)
-    
+    print(line)
+
 df=pd.DataFrame(data)
 
 df['ranking_date']=datetime.datetime.now().strftime('%Y-%m-%d')
@@ -94,4 +94,25 @@ df['ranking_date']=datetime.datetime.now().strftime('%Y-%m-%d')
 load_dotenv()
 AWS_URL=os.getenv("AWS_URL")
 
-load_rankings_to_AWS(df,'rankings_current')
+load_rankings_to_AWS(df,'atp_rankings_current')
+
+
+opener = CustomURLopener()
+response = opener.open('https://live-tennis.eu/en/wta-live-ranking')
+response=response.read().decode()
+
+soup = BeautifulSoup(response, 'html.parser')
+
+all_list=soup.find_all('td',class_='rk')
+
+data=[]
+for i in all_list:
+    line=parse_with_split(str(i))
+    data.append(line)
+    print(line)
+
+df=pd.DataFrame(data)
+
+df['ranking_date']=datetime.datetime.now().strftime('%Y-%m-%d')
+
+load_rankings_to_AWS(df,'wta_rankings_current')
